@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='utf-8' />
+  <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+  <meta name="description" content="NewFields : leaflet/mapbox" />
+  <link rel="stylesheet" type="text/css" media="screen" href="css/template.css">
+  <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+  <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" type="text/css">
+  <link rel="stylesheet" href="css/leaflet.measure.css" />
+  <style>
+  img {
+    border: 0px;
+    box-shadow: 0 0 0px;
+  }
+  #header_wrap {
+    height: 100px;
+  }
+  .what {
+  	width: 100%;
+    padding: 0;
+    color:#fff;
+    font-size:14px;
+  }
+  
+  #project_title {
+    margin-top: -30px;
+  }
+  pre.ui-coordinates {
+    position:absolute;
+    top:635px;
+    right:5px;
+    width:200px;
+    padding:5px 10px;
+    background:rgba(0,0,0,0.5);
+    color:#fff;
+    font-size:11px;
+    line-height:18px;
+    border-radius:3px;
+  }
+  #home {
+    z-index: 100;
+    position: absolute;
+    left: 11px;
+    top: 220px;
+    height: 24px;
+    width: 24px;
+  }
+  #options {
+    z-index: 100;
+    position: absolute;
+    right: 15px;
+    top: 114px;
+    height: 48px;
+    width: 48px;
+  }
+  </style>
+  <title>event listener demo</title>
+</head>
+<body>
+  <!-- HEADER -->
+  <div id="header_wrap" class="outer">
+    <header class="inner">
+      <h1 id="project_title">event listener demo</h1>
+
+    </header>
+  </div>
+  <!-- MAIN CONTENT -->
+  <div id="main_content_wrap" class="outer">
+    <div id="map" style="width: 100%; height: 600px"></div>
+    <script src="http://cdn.leafletjs.com/leaflet-0.7/leaflet.js"></script>
+    <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
+    <script type="text/javascript" src="js/leaflet.ajax.js"></script>
+    <script src="js/leaflet.measure.js"></script>
+    <script>
+	    var map = L.map('map', {measureControl: true}).setView([-22.88437, -43.25924], 16);
+	    var osm = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+	        attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+	    })
+	    osm.addTo(map);
+	    var boundary = new L.GeoJSON.AJAX("geojson/brasil.geojson",
+	    {
+	          //restricts popup content jsut to zone onEachFeature:popUp uses popUp that goes through all fields
+	        onEachFeature: 
+	          function (feature, layer) {
+	            
+	              
+	              boundary.on('click', boundClick);
+	              //layer.on('click', function (e) {
+	               //   alert(feature.properties.zone_);
+	              //});
+	              //map.off('click', onClick);
+	              
+	              layer.on('contextmenu', function (e) {
+	                  alert(feature.properties.zone_);
+	              });
+	           
+	          },
+	          style: function(feature) {
+	              switch (feature.properties.zone_) {
+	                //opacity - outline fillOpacity - fill
+	                  case 'Lot 05': return {color: "#ff0000", "opacity": .9};
+	                  case 'Lot 07': return {color: "#00ff00"};
+	              }
+	          }
+        });
+
+		boundary.addTo(map);
+
+      	function boundClick(e) {
+          alert("polygon click listener event: " + e.latlng.toString());
+      	}
+      	function onClick(e) {
+          alert(e.latlng.toString());
+      	}
+
+      	map.on('click', onClick);
+    </script>
+  </div>
+  <!-- FOOTER  -->
+  
+      <p class="what">
+       <input type="button" onclick="boundary.on('click', boundClick);" value="add poly click event listener">
+       <input type="button" onclick="boundary.off('click', boundClick);" value="remove poly click event listener">
+       <input type="button" onclick="map.off('click', onClick);" value="remove map click event listener">
+       <input type="button" onclick="map.on('click', onClick);" value="add map click event listener"> 1.) click anywhere on the map outside the polygon you will notice the map click event listener is firing, this listener can be turned on/off using the map click buttons. 2.) click on the polygon you will notice the polygon click event listener is firing it fires 7 times due to seven features. this listener can be turned on/off using the polygon click buttons. 3.) click on add map click listener button and click remove poly click listener button - click anywhere on map to alert lat lon but if you click on polygon nothing happens. 4.) similarly click poly and map listeners off then click on measure tool top left click anywhere outside polygon is fine but inside the polygon, the click wont register. <strong>how do I remove listener completely from polygon to allow other listeners to be active in area occupied by polygon?</strong>
+      </p>
+    
+
+</body>
+</html>
